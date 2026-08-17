@@ -1,31 +1,51 @@
-// Register a listener for when a download is created/initiated
-chrome.downloads.onCreated.addListener(async (downloadItem) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
-    // Log a message indicating that a download has been detected
-    console.log("Download detected:");
+    if (message.type === "RESOURCE_CLICKED") {
 
-    // Log the deatails of the download file, including filename, URL, and referrer
-    console.log("Filename:", downloadItem.filename);
-    console.log("URL:", downloadItem.url);
-    console.log("Referrer:", downloadItem.referrer);
+        console.log("===== RESOURCE CLICKED =====");
 
-    // Retrieve all currently open browser tabs
-    const tabs = await chrome.tabs.query({});
+        console.log("Resource name:", message.data.resourceName);
+        console.log("Resource URL:", message.data.resourceUrl);
+        console.log("Resource ID:", message.data.resourceId);
+        console.log("Course page:", message.data.coursePageUrl);
 
-    // Log a message indicating the start of the tab iteration
-    console.log("Open tabs:");
-
-    // Iterate through each open tab
-    for (const tab of tabs) {
-
-        // Check if the tab has a URL and if it contains "courseweb.sliit.lk"
-        if (tab.url && tab.url.includes("courseweb.sliit.lk")) {
-
-            console.log("Courseweb tab found:");
-
-            // Log the title,URL of the Courseweb tab
-            console.log("Title:", tab.title);
-            console.log("URL:", tab.url);
-        }
     }
+
+});
+
+let lastResourceContext = null;
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+
+    if (message.type === "RESOURCE_CONTEXT") {
+
+        lastResourceContext = message.context;
+
+        console.log("===== CONTEXT RECEIVED =====");
+        console.log(lastResourceContext);
+        console.log("============================");
+    }
+
+});
+
+chrome.downloads.onCreated.addListener((download) => {
+
+    const downloadContext = {
+        filename: download.filename,
+        downloadUrl: download.url,
+        referrer: download.referrer,
+
+        resourceTitle: lastResourceContext?.resourceTitle,
+        resourceUrl: lastResourceContext?.resourceUrl,
+
+        courseTitle: lastResourceContext?.courseTitle,
+        courseUrl: lastResourceContext?.courseUrl,
+
+        sectionTitle: lastResourceContext?.sectionTitle,
+        weekTitle: lastResourceContext?.weekTitle
+    };
+
+    console.log("===== FINAL DOWNLOAD CONTEXT =====");
+    console.log(downloadContext);
+    console.log("==================================");
 });
