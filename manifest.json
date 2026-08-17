@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Courseweb Download Organizer",
+  "version": "0.1.0",
+  "description": "Captures Courseweb download information for automatic file organization.",
+  "permissions": [
+    "downloads",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://courseweb.sliit.lk/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
